@@ -40,13 +40,29 @@ public class XlsxConverter extends AbstractConverter {
     
     private static String processCell(Cell cell) {
         CellType cellType = cell.getCellType();
-        return String.valueOf(
+        String cellValue = String.valueOf(
                 switch (cellType) {
-                    case _NONE, ERROR, BLANK -> "";
                     case NUMERIC -> cell.getNumericCellValue();
                     case STRING -> cell.getStringCellValue();
-                    case FORMULA -> cell.getCellFormula();
+                    case FORMULA -> processFormulaCell(cell, cell.getCachedFormulaResultType());
                     case BOOLEAN -> cell.getBooleanCellValue();
+                    default -> "";
                 });
+        return cellValue.contains(",") ? quote(cellValue) : cellValue;
+    }
+    
+    private static String processFormulaCell(Cell cell, CellType formulaResultType) {
+        String cellValue = String.valueOf(
+                switch (formulaResultType) {
+                    case NUMERIC -> cell.getNumericCellValue();
+                    case STRING -> cell.getStringCellValue();
+                    case BOOLEAN -> cell.getBooleanCellValue();
+                    default -> "";
+                });
+        return cellValue.contains(",") ? quote(cellValue) : cellValue;
+    }
+    
+    private static String quote(String string) {
+        return "\"" + string + "\"";
     }
 }
