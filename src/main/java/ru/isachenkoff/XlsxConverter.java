@@ -1,10 +1,7 @@
 package ru.isachenkoff;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
@@ -42,7 +39,7 @@ public class XlsxConverter extends AbstractConverter {
         CellType cellType = cell.getCellType();
         String cellValue = String.valueOf(
                 switch (cellType) {
-                    case NUMERIC -> cell.getNumericCellValue();
+                    case NUMERIC -> processNumericValue(cell.getNumericCellValue());
                     case STRING -> cell.getStringCellValue();
                     case FORMULA -> processFormulaCell(cell, cell.getCachedFormulaResultType());
                     case BOOLEAN -> cell.getBooleanCellValue();
@@ -54,12 +51,20 @@ public class XlsxConverter extends AbstractConverter {
     private static String processFormulaCell(Cell cell, CellType formulaResultType) {
         String cellValue = String.valueOf(
                 switch (formulaResultType) {
-                    case NUMERIC -> cell.getNumericCellValue();
+                    case NUMERIC -> processNumericValue(cell.getNumericCellValue());
                     case STRING -> cell.getStringCellValue();
                     case BOOLEAN -> cell.getBooleanCellValue();
                     default -> "";
                 });
         return cellValue.contains(",") ? quote(cellValue) : cellValue;
+    }
+    
+    private static String processNumericValue(double nValue) {
+        if (nValue == (int)nValue) {
+            return String.valueOf((int)nValue);
+        } else {
+            return String.valueOf(nValue);
+        }
     }
     
     private static String quote(String string) {
