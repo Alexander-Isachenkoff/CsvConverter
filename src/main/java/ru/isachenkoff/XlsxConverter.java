@@ -23,19 +23,19 @@ public class XlsxConverter extends AbstractConverter {
                 .collect(Collectors.toList());
     }
     
-    private static String processSheet(Sheet sheet) {
+    private String processSheet(Sheet sheet) {
         return StreamSupport.stream(sheet.spliterator(), false)
-                .map(XlsxConverter::processRow)
+                .map(this::processRow)
                 .collect(Collectors.joining(System.lineSeparator()));
     }
     
-    private static String processRow(Row row) {
+    private String processRow(Row row) {
         return StreamSupport.stream(row.spliterator(), false)
-                .map(XlsxConverter::processCell)
-                .collect(Collectors.joining(","));
+                .map(this::processCell)
+                .collect(Collectors.joining(getSeparator()));
     }
     
-    private static String processCell(Cell cell) {
+    private String processCell(Cell cell) {
         CellType cellType = cell.getCellType();
         String cellValue = String.valueOf(
                 switch (cellType) {
@@ -45,7 +45,7 @@ public class XlsxConverter extends AbstractConverter {
                     case BOOLEAN -> cell.getBooleanCellValue();
                     default -> "";
                 });
-        return cellValue.contains(",") ? quote(cellValue) : cellValue;
+        return quoteIfContainsSeparator(cellValue);
     }
     
     private static String processFormulaCell(Cell cell, CellType formulaResultType) {
@@ -64,9 +64,5 @@ public class XlsxConverter extends AbstractConverter {
         } else {
             return String.valueOf(nValue);
         }
-    }
-    
-    private static String quote(String string) {
-        return "\"" + string + "\"";
     }
 }

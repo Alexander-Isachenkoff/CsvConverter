@@ -15,6 +15,7 @@ public class Converter {
     static {
         fileTypeConverterMap.put("txt", TxtConverter::new);
         fileTypeConverterMap.put("xlsx", XlsxConverter::new);
+        fileTypeConverterMap.put("docx", DocxConverter::new);
     }
     
     public static void main(String[] args) throws IOException {
