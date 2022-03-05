@@ -1,13 +1,18 @@
 package ru.isachenkoff;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -39,7 +44,7 @@ public class XlsxConverter extends AbstractConverter {
         CellType cellType = cell.getCellType();
         String cellValue = String.valueOf(
                 switch (cellType) {
-                    case NUMERIC -> processNumericValue(cell.getNumericCellValue());
+                    case NUMERIC -> processCellWithNumericValue(cell);
                     case STRING -> cell.getStringCellValue();
                     case FORMULA -> processFormulaCell(cell, cell.getCachedFormulaResultType());
                     case BOOLEAN -> cell.getBooleanCellValue();
@@ -51,11 +56,21 @@ public class XlsxConverter extends AbstractConverter {
     private static String processFormulaCell(Cell cell, CellType formulaResultType) {
         return String.valueOf(
                 switch (formulaResultType) {
-                    case NUMERIC -> processNumericValue(cell.getNumericCellValue());
+                    case NUMERIC -> processCellWithNumericValue(cell);
                     case STRING -> cell.getStringCellValue();
                     case BOOLEAN -> cell.getBooleanCellValue();
                     default -> "";
                 });
+    }
+    
+    private static String processCellWithNumericValue(Cell cell) {
+        String formatString = cell.getCellStyle().getDataFormatString();
+        boolean isData = StringUtils.containsAnyIgnoreCase(formatString, "m", "d", "s", "h", "y");
+        if (isData) {
+            return new SimpleDateFormat(formatString.replace("m", "M")).format(cell.getDateCellValue());
+        } else {
+            return processNumericValue(cell.getNumericCellValue());
+        }
     }
     
     private static String processNumericValue(double nValue) {
