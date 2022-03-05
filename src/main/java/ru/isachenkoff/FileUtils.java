@@ -3,6 +3,7 @@ package ru.isachenkoff;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +11,14 @@ public class FileUtils {
     private static final String INPUT_DIR_NAME = "input";
     private static final String OUTPUT_DIR_NAME = "output";
     private static final Pattern fileNamePattern = Pattern.compile("(.*/)?(?<name>.*)\\.(?<ext>.*)");
+    
+    public static List<File> getInputFiles() {
+        File[] files = new File(INPUT_DIR_NAME).listFiles();
+        if (files == null || files.length == 0) {
+            throw new IllegalStateException("Input directory is empty");
+        }
+        return List.of(files);
+    }
     
     public static File getInputFile() {
         File[] files = new File(INPUT_DIR_NAME).listFiles();
@@ -42,7 +51,7 @@ public class FileUtils {
     
     public static void writeCsv(String oldName, String result) {
         try {
-            Files.writeString(new File(OUTPUT_DIR_NAME, oldName + "r.csv").toPath(), result);
+            Files.writeString(new File(OUTPUT_DIR_NAME, oldName + ".csv").toPath(), result);
         } catch (IOException e) {
             e.printStackTrace();
         }

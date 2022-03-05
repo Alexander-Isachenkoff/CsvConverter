@@ -18,10 +18,22 @@ public class Converter {
         fileTypeConverterMap.put("docx", DocxConverter::new);
     }
     
-    public static void main(String[] args) throws IOException {
-        File inputFile = FileUtils.getInputFile();
+    public static void main(String[] args) {
+        for (File file : FileUtils.getInputFiles()) {
+            System.out.println("Processing " + file.getName());
+            processFile(file);
+        }
+    }
+    
+    private static void processFile(File inputFile) {
         AbstractConverter converter = findConverterFor(inputFile);
-        List<Pair<String, String>> result = converter.convert(inputFile);
+        List<Pair<String, String>> result;
+        try {
+            result = converter.convert(inputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         for (Pair<String, String> pair : result) {
             FileUtils.writeCsv(pair.getLeft(), pair.getRight());
         }
