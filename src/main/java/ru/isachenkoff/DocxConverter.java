@@ -23,7 +23,7 @@ public class DocxConverter extends AbstractConverter {
         for (int i = 0; i < tables.size(); i++) {
             XWPFTable table = tables.get(i);
             String result = processTable(table);
-            results.add(Pair.of(FileUtils.getName(file) + (i+1), result));
+            results.add(Pair.of(FileUtils.getName(file) + "-" + (i + 1), result));
         }
         return results;
     }
