@@ -49,14 +49,13 @@ public class XlsxConverter extends AbstractConverter {
     }
     
     private static String processFormulaCell(Cell cell, CellType formulaResultType) {
-        String cellValue = String.valueOf(
+        return String.valueOf(
                 switch (formulaResultType) {
                     case NUMERIC -> processNumericValue(cell.getNumericCellValue());
                     case STRING -> cell.getStringCellValue();
                     case BOOLEAN -> cell.getBooleanCellValue();
                     default -> "";
                 });
-        return cellValue.contains(",") ? quote(cellValue) : cellValue;
     }
     
     private static String processNumericValue(double nValue) {
