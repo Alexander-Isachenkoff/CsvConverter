@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,9 +69,12 @@ public class XlsxConverter extends AbstractConverter {
         boolean isData = StringUtils.containsAnyIgnoreCase(formatString, "m", "d", "s", "h", "y");
         if (isData) {
             return new SimpleDateFormat(formatString.replace("m", "M")).format(cell.getDateCellValue());
-        } else {
-            return processNumericValue(cell.getNumericCellValue());
         }
+        if (!formatString.equals("General")) {
+            DecimalFormat df = new DecimalFormat(cell.getCellStyle().getDataFormatString());
+            return df.format(cell.getNumericCellValue());
+        }
+        return processNumericValue(cell.getNumericCellValue());
     }
     
     private static String processNumericValue(double nValue) {
