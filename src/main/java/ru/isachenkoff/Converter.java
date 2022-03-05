@@ -10,6 +10,13 @@ import java.util.function.Supplier;
 
 public class Converter {
     
+    private static final HashMap<String, Supplier<AbstractConverter>> fileTypeConverterMap = new HashMap<>();
+    
+    static {
+        fileTypeConverterMap.put("txt", TxtConverter::new);
+        fileTypeConverterMap.put("xlsx", XlsxConverter::new);
+    }
+    
     public static void main(String[] args) throws IOException {
         File inputFile = FileUtils.getInputFile();
         AbstractConverter converter = findConverterFor(inputFile);
@@ -21,13 +28,10 @@ public class Converter {
     
     private static AbstractConverter findConverterFor(File file) {
         String ext = FileUtils.getExt(file).toLowerCase();
-        HashMap<String, Supplier<AbstractConverter>> map = new HashMap<>();
-        map.put("txt", TxtConverter::new);
-        map.put("xlsx", XlsxConverter::new);
-        if (!map.containsKey(ext)) {
+        if (!fileTypeConverterMap.containsKey(ext)) {
             throw new RuntimeException("Unexpected file type");
         }
-        return map.get(ext).get();
+        return fileTypeConverterMap.get(ext).get();
     }
     
 }
