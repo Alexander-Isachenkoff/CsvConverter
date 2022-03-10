@@ -1,6 +1,5 @@
 package ru.isachenkoff;
 
-import org.apache.commons.collections4.list.TreeList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -32,9 +31,9 @@ public class XmlConverter extends AbstractConverter {
             return null;
         }
         
-        List<Map<String, String>> table = new TreeList<>();
+        List<Map<String, String>> table = new ArrayList<>();
         elements(root).forEach(xmlRow -> {
-            HashMap<String, String> row = new HashMap<>();
+            Map<String, String> row = new LinkedHashMap<>();
             table.add(row);
             elements(xmlRow).forEach(xmlColumn -> row.put(xmlColumn.getNodeName(), xmlColumn.getChildNodes().item(0).getTextContent()));
         });
